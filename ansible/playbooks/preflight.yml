@@ -1,0 +1,6 @@
+---
+- name: Read-only local PlatformOps prerequisite check
+  hosts: local
+  gather_facts: true
+  roles:
+    - preflight

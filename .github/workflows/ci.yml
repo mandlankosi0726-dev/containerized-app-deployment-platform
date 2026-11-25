@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths:
+      - app/**
+      - docker/**
+      - kubernetes/**
+      - helm/**
+      - .github/workflows/**
+      - Makefile
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: app/requirements-dev.lock
+      - run: python -m pip install -r app/requirements-dev.lock
+      - run: python -m pip install --no-deps -e app
+      - run: ruff check app/src app/tests
+      - run: ruff format --check app/src app/tests
+      - run: pytest app/tests
+
+  containers-and-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - uses: helm/chart-testing-action@v2
+        with:
+          version: v3.12.0
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: app
+          push: false
+          tags: platformops:ci
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - run: kubectl kustomize kubernetes/overlays/development > /tmp/rendered.yaml
+      - run: helm lint helm/platformops --values helm/platformops/values-development.yaml
+      - run: helm template platformops helm/platformops --namespace platformops --values helm/platformops/values-development.yaml --set-string image.tag=validation

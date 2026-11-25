@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platformops-config
+  namespace: platformops
+data:
+  APP_NAME: PlatformOps API
+  APP_VERSION: "0.1.0"
+  APP_ENVIRONMENT: development
+  BUILD_REVISION: local
+  BUILD_DATE: unknown
+  LOG_LEVEL: INFO

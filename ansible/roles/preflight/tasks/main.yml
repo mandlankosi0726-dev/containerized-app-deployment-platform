@@ -1,0 +1,21 @@
+---
+- name: Check local development executables
+  ansible.builtin.command:
+    argv:
+      - sh
+      - -lc
+      - "command -v {{ item }}"
+  loop:
+    - docker
+    - kubectl
+    - kind
+    - helm
+    - python3
+  register: prerequisite_commands
+  changed_when: false
+  failed_when: false
+
+- name: Report prerequisite availability
+  ansible.builtin.debug:
+    msg: "{{ item.item }}: {{ 'available' if item.rc == 0 else 'missing' }}"
+  loop: "{{ prerequisite_commands.results }}"

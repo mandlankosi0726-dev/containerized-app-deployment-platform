@@ -1,0 +1,46 @@
+replicaCount: 2
+image:
+  repository: platformops-deployment-platform
+  tag: dev
+  pullPolicy: IfNotPresent
+nameOverride: ""
+fullnameOverride: ""
+serviceAccount:
+  create: true
+  name: ""
+podLabels: {}
+config:
+  appName: PlatformOps API
+  appVersion: "0.1.0"
+  environment: development
+  buildRevision: local
+  buildDate: unknown
+  logLevel: INFO
+service:
+  type: ClusterIP
+  port: 80
+ingress:
+  enabled: false
+  className: ""
+  host: platformops.local
+  path: /
+resources:
+  requests:
+    cpu: 100m
+    memory: 96Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+networkPolicy:
+  enabled: true

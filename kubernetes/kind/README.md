@@ -1,0 +1,3 @@
+# Kind
+
+Create only the dedicated cluster with `./scripts/create-cluster.sh`. It uses one control-plane node and pins the Kind node image to Kubernetes v1.31.4. This is suitable for a workstation and does not demonstrate node-level high availability. Kind selects its newly created context by default; the script records and restores the previously selected context after readiness checks, while all project Kubernetes commands pass `--context kind-platformops` explicitly. Delete only this named cluster using `./scripts/delete-cluster.sh` after reviewing its confirmation prompt. No host ports are mapped; application access uses `kubectl port-forward`.
